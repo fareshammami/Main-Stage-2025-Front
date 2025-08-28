@@ -1,0 +1,47 @@
+<div class="user-list-card">
+  <h2>List of users</h2>
+
+  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <input
+      type="text"
+      [(ngModel)]="searchEmail"
+      (ngModelChange)="onEmailChange()"
+      placeholder="Recherche par email"
+    />
+
+    <div class="amount-slider">
+      <label>Max Amount: {{ maxAmount }} €</label>
+      <input type="range" [(ngModel)]="maxAmount" (ngModelChange)="onAmountChange()" min="0" max="5000" step="100" />
+    </div>
+  </div>
+
+  <!-- Users Table -->
+  <table>
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>Last Amount</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{ user.email }}</td>
+        <td>{{ user.lastInduAmount !== null ? user.lastInduAmount : '-' }}</td>
+        <td>
+          <button class="view-btn" (click)="viewUser(user.id)">Voir le flux</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Pagination -->
+  <div class="pagination">
+    <button (click)="prevPage()" [disabled]="currentPage === 0">⬅ Previous</button>
+    <span>Page {{ currentPage + 1 }} / {{ totalPages }}</span>
+    <button (click)="nextPage()" [disabled]="currentPage + 1 >= totalPages">Next ➡</button>
+  </div>
+</div>

@@ -1,0 +1,37 @@
+<div class="validation-container">
+  <h2>User Management</h2>
+
+  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+  <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
+
+  <div class="table-wrapper">
+    <table *ngIf="!loading && users.length > 0" class="styled-table">
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Validated</th>
+          <th>Role</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{ user.email }}</td>
+          <td>{{ user.validated ? '✅' : '❌' }}</td>
+          <td>
+            <button (click)="toggleRole(user)">
+              {{ user.role === 'ADMIN' ? 'Admin' : 'User' }}
+            </button>
+          </td>
+          <td>
+            <button *ngIf="!user.validated" (click)="validate(user.id)">Validate</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="!loading && users.length === 0" class="no-users">
+    🎉 No users found.
+  </div>
+</div>

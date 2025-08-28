@@ -1,0 +1,100 @@
+.validation-container {
+  font-family: 'Arial', sans-serif;
+  color: #1a1a1a;
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* center content */
+}
+
+/* Header */
+h2 {
+  font-size: 24px;
+  margin-bottom: 15px;
+  text-align: center; /* center header */
+}
+
+/* Messages */
+.message {
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  font-weight: 500;
+  max-width: 600px; /* limit width for messages */
+  text-align: center;
+}
+
+.message.error {
+  background-color: #ffe5e5;
+  color: #d32f2f;
+}
+
+.message.success {
+  background-color: #e5ffe5;
+  color: #388e3c;
+}
+
+/* Table wrapper to center */
+.table-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center; /* center table horizontally */
+}
+
+/* Table */
+.styled-table {
+  width: 60%; /* smaller width */
+  min-width: 300px;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.styled-table th, .styled-table td {
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.styled-table thead {
+  background-color: #f1f5f9;
+  font-weight: 600;
+}
+
+.styled-table tbody tr {
+  background-color: #ffffff;
+  transition: background 0.2s;
+}
+
+.styled-table tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+.styled-table tbody tr:hover {
+  background-color: #e0f2f1;
+}
+
+/* Buttons */
+.validate-btn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  background-color: #2e7d32;
+  color: white;
+  transition: background-color 0.2s;
+}
+
+.validate-btn:hover {
+  background-color: #276c2b;
+}
+
+/* No users */
+.no-users {
+  margin-top: 15px;
+  font-weight: 500;
+  color: #555;
+  text-align: center;
+}

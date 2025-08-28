@@ -1,0 +1,31 @@
+<nav class="navbar">
+  <!-- Left side -->
+  <div class="nav-left">
+    <!-- Logo -->
+    <a routerLink="/" class="nav-logo">
+      <img src="https://rcc.be-ys-outsourcing-services.com/wp-content/uploads/2024/04/software.png" alt="Logo" />
+    </a>
+
+    <!-- Home link -->
+    <a routerLink="/" class="nav-link">🏠 Home</a>
+
+    <!-- My Space (visible to all logged-in users) -->
+    <a *ngIf="username" [routerLink]="['/user', userId, 'handled-stream']" class="nav-link">👤 My Space</a>
+
+    <!-- Admin Panel (only admin role) -->
+    <a *ngIf="isAdmin()" routerLink="/admin/validate-users" class="nav-link">🔐 Admin Panel</a>
+  </div>
+
+  <!-- Right side: User dropdown -->
+  <div class="nav-right" *ngIf="username">
+    <div class="dropdown">
+      <button class="dropbtn">
+        {{ username }} ⬇
+      </button>
+      <div class="dropdown-content">
+        <a (click)="manageAccount()">⚙ Manage My Account</a>
+        <a (click)="logout()">🚪 Logout</a>
+      </div>
+    </div>
+  </div>
+</nav>

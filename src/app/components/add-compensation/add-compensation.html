@@ -1,0 +1,13 @@
+<div class="form-card">
+  <h2>Ajouter une compensation</h2>
+
+  <!-- Messages -->
+  <div *ngIf="errorMessage" class="message error">{{ errorMessage }}</div>
+  <div *ngIf="successMessage" class="message success">{{ successMessage }}</div>
+
+  <!-- Input & Button -->
+  <div class="form-group">
+    <input type="number" [(ngModel)]="newCompensationAmount" placeholder="Montant compensation" />
+    <button class="submit-btn" (click)="addCompensation()">Ajouter Compensation</button>
+  </div>
+</div>

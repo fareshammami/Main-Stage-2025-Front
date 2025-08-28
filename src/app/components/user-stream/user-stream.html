@@ -1,0 +1,123 @@
+
+<div class="user-stream-container">
+
+  <!-- User Header Card -->
+  <div class="user-header-card">
+    <h2>{{ username || userId }}</h2>
+  </div>
+
+  <!-- Main Messages -->
+  <div *ngIf="errorMessage" class="message error">{{ errorMessage }}</div>
+  <div *ngIf="successMessage" class="message success">{{ successMessage }}</div>
+  <div *ngIf="loading" class="loading">Chargement...</div>
+
+  <!-- Action Buttons -->
+  <div class="actions-card">
+    <button class="action-btn" (click)="toggleForm('indu')">
+      <span>➕</span> Add Indu
+    </button>
+    <button class="action-btn" (click)="toggleForm('comp')">
+      <span>💰</span> Add Compensation
+    </button>
+  </div>
+
+  <!-- Add Indu Error Form -->
+<div class="form-card slide" [class.active]="showAddIndu">
+  <div class="form-card-header">
+    <h3>➕ Add une Indu</h3>
+  </div>
+  <div class="form-card-body">
+    <div *ngIf="induErrorMessage" class="message error">{{ induErrorMessage }}</div>
+    <div *ngIf="induSuccessMessage" class="message success">{{ induSuccessMessage }}</div>
+
+    <div class="form-group">
+      <input type="number" [(ngModel)]="newInduAmount" placeholder="Montant erreur Indu" />
+      <button class="submit-btn" (click)="addInduError()">Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Compensation Form -->
+<div class="form-card slide" [class.active]="showAddCompensation">
+  <div class="form-card-header">
+    <h3>💰 Add une compensation</h3>
+  </div>
+  <div class="form-card-body">
+    <div *ngIf="compErrorMessage" class="message error">{{ compErrorMessage }}</div>
+    <div *ngIf="compSuccessMessage" class="message success">{{ compSuccessMessage }}</div>
+
+    <div class="form-group">
+      <input type="number" [(ngModel)]="newCompensationAmount" placeholder="Montant compensation" />
+      <button class="submit-btn" (click)="addCompensation()">Ajouter</button>
+    </div>
+  </div>
+</div>
+
+  <!-- Filters Card -->
+  <div class="filters-card">
+    <div class="filter-options">
+      <label>
+        <input type="radio" name="filter" [value]="'ALL'" (change)="changeFilter('ALL')" [checked]="currentFilter === 'ALL'"> Tous
+      </label>
+      <label>
+        <input type="radio" name="filter" [value]="'ONLY_HANDLED'" (change)="changeFilter('ONLY_HANDLED')" [checked]="currentFilter === 'ONLY_HANDLED'"> Traités
+      </label>
+      <label>
+        <input type="radio" name="filter" [value]="'ONLY_UNHANDLED'" (change)="changeFilter('ONLY_UNHANDLED')" [checked]="currentFilter === 'ONLY_UNHANDLED'"> Non traités
+      </label>
+    </div>
+
+    <div class="filter-type">
+      <label>Type of events :</label>
+      <select [(ngModel)]="selectedEventType" (change)="loadStream()">
+        <option value="">Tous</option>
+        <option value="InduErrorCurrentStateEvent">InduErrorCurrentStateEvent</option>
+        <option value="InduErrorCreatedEvent">InduErrorCreatedEvent</option>
+        <option value="CompensationCreatedEvent">CompensationCreatedEvent</option>
+      </select>
+    </div>
+
+    <div class="filter-date">
+      <label>From :</label>
+      <input type="date" [(ngModel)]="fromDate" (change)="loadStream()" />
+      <label>To :</label>
+      <input type="date" [(ngModel)]="toDate" (change)="loadStream()" />
+    </div>
+  </div>
+
+  <hr />
+
+  <!-- Event Table -->
+  <h3>Events Received</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Type of Events</th>
+        <th>Amount</th>
+        <th>Statut</th>
+        <th>Created at</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let event of events">
+        <td>{{ event.eventType }}</td>
+        <td>{{ getAmount(event) }}</td>
+        <td>{{ currentFilter === 'ONLY_HANDLED' ? 'TRAITÉ' : (event.payload.status || '-') }}</td>
+        <td>{{ event.createdAt | date:'short' }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Pagination -->
+  <div class="pagination">
+    <button (click)="prevPage()" [disabled]="currentPage === 0">Previous</button>
+    <span>Page {{ currentPage + 1 }}</span>
+    <button (click)="nextPage()" [disabled]="events.length < pageSize">Next</button>
+  </div>
+
+  <!-- Process Errors Button -->
+  <div class="process-errors-card">
+    <button class="process-btn" (click)="processErrors()">⚡Process the user</button>
+  </div>
+
+</div>

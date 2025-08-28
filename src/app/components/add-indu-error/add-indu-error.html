@@ -1,0 +1,13 @@
+<div class="form-card">
+  <h2>Ajouter une erreur Indu</h2>
+
+  <!-- Messages -->
+  <div *ngIf="errorMessage" class="message error">{{ errorMessage }}</div>
+  <div *ngIf="successMessage" class="message success">{{ successMessage }}</div>
+
+  <!-- Input & Button -->
+  <div class="form-group">
+    <input type="number" [(ngModel)]="newInduAmount" placeholder="Montant erreur Indu" />
+    <button class="submit-btn" (click)="addInduError()">Ajouter Erreur Indu</button>
+  </div>
+</div>
