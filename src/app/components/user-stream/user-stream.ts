@@ -4,7 +4,7 @@ import { InduErrorService } from '../../services/indu-error.service';
 import { UserService } from '../../services/user.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { UserInduState } from '../../Models/UserInduState';
 
 @Component({
   selector: 'app-user-stream',
@@ -15,12 +15,16 @@ import { RouterModule } from '@angular/router';
 })
 export class UserStreamComponent implements OnInit {
 
-  userId: string = '';
-  username: string = '';
+  userId = '';
+  username = '';
   events: any[] = [];
   errorMessage = '';
   successMessage = '';
   loading = false;
+
+  // User state
+  netTotal: number | null = null;
+  totalsUpdated = false;
 
   // Filters
   currentFilter = 'ALL';  
@@ -32,14 +36,11 @@ export class UserStreamComponent implements OnInit {
   currentPage = 0;
   pageSize = 10;
 
-  // Embedded forms
+  // Forms
   showAddIndu = false;
   showAddCompensation = false;
-
   newInduAmount: number | null = null;
   newCompensationAmount: number | null = null;
-
-  // Form messages
   induErrorMessage = '';
   induSuccessMessage = '';
   compErrorMessage = '';
@@ -53,17 +54,17 @@ export class UserStreamComponent implements OnInit {
 
   ngOnInit(): void {
     this.userId = this.route.snapshot.paramMap.get('userId') || '';
-    if (this.userId) {
-      this.loadUsername();
-      this.loadStream();
-    } else {
+    if (!this.userId) {
       this.errorMessage = 'Aucun identifiant utilisateur fourni.';
+      return;
     }
+    this.loadUsername();
+    this.refreshData();
   }
 
   loadUsername(): void {
     this.userService.getUsername(this.userId).subscribe({
-      next: (data) => this.username = data.username,
+      next: data => this.username = data.username,
       error: () => this.username = 'Utilisateur inconnu'
     });
   }
@@ -80,99 +81,121 @@ export class UserStreamComponent implements OnInit {
       this.fromDate ? this.fromDate + "T00:00:00Z" : '',
       this.toDate ? this.toDate + "T23:59:59Z" : ''
     ).subscribe({
-      next: (data) => {
-        this.events = data;
-        this.loading = false;
+      next: data => { this.events = data; this.loading = false; },
+      error: () => { this.errorMessage = 'Erreur lors du chargement des événements.'; this.loading = false; }
+    });
+  }
+
+  loadNetTotal(): void {
+    this.induErrorService.getUserState(this.userId).subscribe({
+      next: (state: UserInduState) => {
+        if (this.netTotal !== state.netTotal) {
+          this.totalsUpdated = true;
+          setTimeout(() => this.totalsUpdated = false, 800); // flash effect
+        }
+        this.netTotal = state.netTotal ?? 0;
       },
-      error: () => {
-        this.errorMessage = 'Cette Utilisateur n"est pas encore valider.';
-        this.loading = false;
+      error: (err) => {
+        console.error('Error loading netTotal:', err);
+        this.netTotal = null;
       }
     });
   }
 
-  // Filters
+  refreshData(): void {
+    this.loadStream();
+    this.loadNetTotal();
+  }
+
   changeFilter(filter: string): void {
     this.currentFilter = filter;
     this.currentPage = 0;
-    this.loadStream();
+    this.refreshData();
   }
 
   getAmount(event: any): string {
-    return event.payload.amount ?? event.payload.totalUntreatedAmount ?? '-';
+    if (event.payload?.amount !== undefined) return event.payload.amount.toFixed(2);
+    if (event.payload?.totalHandledInduErrors !== undefined && event.payload?.totalHandledCompensations !== undefined) {
+      return (event.payload.totalHandledInduErrors - event.payload.totalHandledCompensations).toFixed(2);
+    }
+    return '-';
   }
 
-  // Process Errors
+  getStatus(event: any): string {
+    if (!event.payload?.status) return '-';
+    return event.payload.status === 'TRAITED' ? 'TRAITÉ' : 'NON TRAITÉ';
+  }
+
   processErrors(): void {
     this.clearMessages();
     this.induErrorService.processErrors(this.userId).subscribe({
-      next: () => {
-        this.successMessage = 'Traitement effectué avec succès.';
-        this.loadStream();
-      },
+      next: () => this.refreshData(),
       error: () => this.errorMessage = 'Erreur lors du traitement des erreurs.'
+    });
+  }
+
+  nextPage(): void { 
+    if (this.events.length === this.pageSize) { 
+      this.currentPage++; 
+      this.loadStream(); 
+    } 
+  }
+
+  prevPage(): void { 
+    if (this.currentPage > 0) { 
+      this.currentPage--; 
+      this.loadStream(); 
+    } 
+  }
+
+  toggleForm(form: 'indu' | 'comp') {
+    if (form === 'indu') { 
+      this.showAddIndu = !this.showAddIndu; 
+      if (this.showAddIndu) this.showAddCompensation = false; 
+    } else { 
+      this.showAddCompensation = !this.showAddCompensation; 
+      if (this.showAddCompensation) this.showAddIndu = false; 
+    }
+  }
+
+  addInduError(): void {
+    if (!this.newInduAmount || this.newInduAmount <= 0) { 
+      this.induErrorMessage = 'Merci de saisir un montant valide.'; 
+      return; 
+    }
+    this.clearMessages();
+    this.induErrorService.addInduError(this.userId, this.newInduAmount).subscribe({
+      next: () => { 
+        this.induSuccessMessage = 'Erreur Indu ajoutée avec succès.'; 
+        this.newInduAmount = null; 
+        this.refreshData(); 
+      },
+      error: () => this.induErrorMessage = 'Erreur lors de l\'ajout de l\'erreur Indu.'
+    });
+  }
+
+  addCompensation(): void {
+    if (!this.newCompensationAmount || this.newCompensationAmount <= 0) { 
+      this.compErrorMessage = 'Merci de saisir un montant valide.'; 
+      return; 
+    }
+    this.clearMessages();
+    this.induErrorService.addCompensation(this.userId, this.newCompensationAmount).subscribe({
+      next: () => { 
+        this.compSuccessMessage = 'Compensation ajoutée avec succès.'; 
+        this.newCompensationAmount = null; 
+        this.refreshData(); 
+      },
+      error: () => this.compErrorMessage = 'Erreur lors de l\'ajout de la compensation.'
     });
   }
 
   clearMessages(): void {
     this.successMessage = '';
     this.errorMessage = '';
-  }
-
-  // Pagination
-  nextPage(): void {
-    if (this.events.length === this.pageSize) {
-      this.currentPage++;
-      this.loadStream();
-    }
-  }
-
-  prevPage(): void {
-    if (this.currentPage > 0) {
-      this.currentPage--;
-      this.loadStream();
-    }
-  }
-
-  // Toggle forms with sliding
-  toggleForm(form: 'indu' | 'comp') {
-    if (form === 'indu') {
-      this.showAddIndu = !this.showAddIndu;
-      if (this.showAddIndu) this.showAddCompensation = false;
-    } else {
-      this.showAddCompensation = !this.showAddCompensation;
-      if (this.showAddCompensation) this.showAddIndu = false;
-    }
-  }
-
-  // Embedded forms
-  addInduError(): void {
     this.induErrorMessage = '';
     this.induSuccessMessage = '';
-    if (this.newInduAmount && this.newInduAmount > 0) {
-      this.induErrorService.addInduError(this.userId, this.newInduAmount).subscribe({
-        next: () => {
-          this.induSuccessMessage = 'Erreur Indu ajoutée avec succès.';
-          this.newInduAmount = null;
-          this.loadStream();
-        },
-        error: () => this.induErrorMessage = 'Erreur lors de l\'ajout de l\'erreur Indu.'
-      });
-    } else this.induErrorMessage = 'Merci de saisir un montant valide.';
-  }
-
-  addCompensation(): void {
     this.compErrorMessage = '';
     this.compSuccessMessage = '';
-    if (this.newCompensationAmount && this.newCompensationAmount > 0) {
-      this.induErrorService.addCompensation(this.userId, this.newCompensationAmount).subscribe({
-        next: () => {
-          this.compSuccessMessage = 'Compensation ajoutée avec succès.';
-          this.newCompensationAmount = null;
-          this.loadStream();
-        },
-        error: () => this.compErrorMessage = 'Erreur lors de l\'ajout de la compensation.'
-      });
-    } else this.compErrorMessage = 'Merci de saisir un montant valide.';
   }
 }

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { InduError } from '../Models/indu-error.model';
 import { Compensation } from '../Models/compensation.model';
+import { UserInduState } from '../Models/UserInduState';
 
 @Injectable({
   providedIn: 'root'
@@ -30,18 +31,21 @@ export class InduErrorService {
   }
 
   getEventStream(
-  userId: string,
-  filter: string = 'ALL',
-  page: number = 0,
-  size: number = 10,
-  eventType: string = '',
-  fromDate: string = '',
-  toDate: string = ''
-): Observable<any[]> {
-  let url = `${this.baseUrl}/stream/${userId}?filter=${filter}&page=${page}&size=${size}`;
-  if (eventType) url += `&eventType=${eventType}`;
-  if (fromDate) url += `&fromDate=${fromDate}`;
-  if (toDate) url += `&toDate=${toDate}`;
-  return this.http.get<any[]>(url);
-}
+    userId: string,
+    filter: string = 'ALL',
+    page: number = 0,
+    size: number = 10,
+    eventType: string = '',
+    fromDate: string = '',
+    toDate: string = ''
+  ): Observable<any[]> {
+    let url = `${this.baseUrl}/projection/${userId}?filter=${filter}&page=${page}&size=${size}`;
+    if (eventType) url += `&eventType=${eventType}`;
+    if (fromDate) url += `&fromDate=${fromDate}`;
+    if (toDate) url += `&toDate=${toDate}`;
+    return this.http.get<any[]>(url);
+  }
+  getUserState(userId: string): Observable<UserInduState> {
+    return this.http.get<UserInduState>(`${this.baseUrl}/state/${userId}`);
+  }
 }

@@ -1,4 +1,3 @@
-/* ==== Global Container ==== */
 .user-stream-container {
   max-width: 1000px;
   margin: 30px auto;
@@ -10,87 +9,53 @@
   color: #333;
 }
 
-/* ==== Header Section ==== */
-.user-header-card {
-  background:white;
-  color: black;
-  text-align: center;
-  padding: 15px 10px; /* smaller padding */
+/* Header + Totals */
+.user-header-state-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f1f5f9;
+  padding: 16px 20px;
   border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
   margin-bottom: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.user-header-card h2 {
+.user-header-state-card .user-info h2 {
   margin: 0;
-  font-size: 1.5rem; /* smaller font */
-  font-weight: 600;
-  letter-spacing: 0.5px;
-}
-
-.user-header-card::before {
-  content: "";
-  position: absolute;
-  top: -50px;
-  right: -50px;
-  width: 120px;
-  height: 120px;
-  background: rgba(255,255,255,0.15);
-  border-radius: 50%;
-}
-
-.user-header-card::after {
-  content: "";
-  position: absolute;
-  bottom: -40px;
-  left: -40px;
-  width: 100px;
-  height: 100px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 50%;
-}
-
-.user-header-card h2 {
-  margin: 0;
-  font-size: 2rem;
+  font-size: 28px;
   font-weight: 700;
-  letter-spacing: 1px;
+  color: #2e7d32;
 }
 
-.user-header-card .subtitle {
-  margin-top: 8px;
-  font-size: 1rem;
-  font-weight: 400;
-  opacity: 0.9;
+.user-header-state-card .user-totals {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  background-color: #e8f5e9;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.6s ease;
 }
 
-/* ==== Highlighted Last Amount ==== */
-.last-amount-card {
-  background: linear-gradient(135deg, white, #9f9f9f);
-  border: 1px solid #e6c200;
-  padding: 15px 22px;
-  margin: 18px 0;
-  border-radius: 10px;
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #4d3800;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-  text-align: center;
+.user-header-state-card .user-totals.updated {
+  animation: flashTotal 1s ease;
 }
 
-/* ==== Section Titles ==== */
-h3 {
-  margin-top: 25px;
-  margin-bottom: 12px;
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #007acc;
-  border-bottom: 2px solid #007acc;
-  display: inline-block;
-  padding-bottom: 4px;
+@keyframes flashTotal {
+  0% { background-color: #fff59d; }
+  50% { background-color: #e8f5e9; }
+  100% { background-color: #e8f5e9; }
 }
 
-/* ==== Table Styling ==== */
+.user-header-state-card .totals-label { font-size: 14px; color: #555; }
+.user-header-state-card .totals-value { font-size: 22px; font-weight: 700; color: #2e7d32; }
+
+/* Messages */
+.message.error { color: #d9534f; margin: 12px 0; font-weight: 500; }
+.loading { color: #007acc; font-weight: bold; font-size: 1rem; margin: 12px 0; }
+
+/* Table */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -100,83 +65,23 @@ table {
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
-table th, table td {
-  border: 1px solid #eee;
-  padding: 12px 14px;
-  text-align: left;
-  font-size: 0.95rem;
-}
+table th, table td { padding: 12px 14px; text-align: left; font-size: 0.95rem; }
+table th { background-color: #f0f6ff; font-weight: 600; }
+table tr:nth-child(even) { background-color: #fafafa; }
+table tr:hover { background-color: #f1f9ff; }
 
-table th {
-  background-color: #f0f6ff;
-  color: #333;
-  font-weight: 600;
-}
-
-table tr:nth-child(even) {
-  background-color: #fafafa;
-}
-
-table tr:hover {
-  background-color: #f1f9ff;
-}
-
-/* ==== Error and Loading Messages ==== */
-.message.error {
-  color: #d9534f;
-  margin: 12px 0;
-  font-weight: 500;
-}
-
-.loading {
-  color: #007acc;
-  font-weight: bold;
-  font-size: 1rem;
-  margin: 12px 0;
-}
-
-/* ==== Pagination Controls ==== */
-.pagination {
-  text-align: center;
-  margin-top: 15px;
-}
-
+/* Pagination */
+.pagination { text-align: center; margin-top: 15px; }
 .pagination button {
-  margin: 0 6px;
-  padding: 8px 14px;
-  border: none;
-  background: #007acc;
-  color: white;
-  font-size: 0.9rem;
-  font-weight: 500;
-  border-radius: 6px;
-  cursor: pointer;
+  margin: 0 6px; padding: 8px 14px; border: none; background: #007acc; color: white;
+  font-size: 0.9rem; font-weight: 500; border-radius: 6px; cursor: pointer;
   transition: background 0.25s ease, transform 0.2s ease;
 }
+.pagination button:hover:not(:disabled) { background: #005fa3; transform: translateY(-2px); }
+.pagination button:disabled { background: #ccc; cursor: not-allowed; }
 
-.pagination button:hover:not(:disabled) {
-  background: #005fa3;
-  transform: translateY(-2px);
-}
-
-.pagination button:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-
-/* ==== Responsive Design ==== */
+/* Responsive */
 @media (max-width: 768px) {
-  .user-stream-container {
-    padding: 15px;
-  }
-
-  table th, table td {
-    padding: 8px 10px;
-    font-size: 0.85rem;
-  }
-
-  .last-amount-card {
-    font-size: 1rem;
-    padding: 12px 15px;
-  }
+  .user-stream-container { padding: 15px; }
+  table th, table td { padding: 8px 10px; font-size: 0.85rem; }
 }

@@ -1,18 +1,15 @@
 <div class="user-stream-container">
- 
-  <!-- User Header Card -->
-  <div class="user-header-card">
-  <h2>✨ My Space</h2>
-    </div>
 
-  <!-- Last Indu Amount -->
-  <div class="last-amount-card" *ngIf="lastInduAmount !== null">
-  <div class="amount-icon">💰</div>
-  <div class="amount-info">
-    <span class="amount-label">Current Amount: </span>
-    <span class="amount-value">{{ lastInduAmount }}</span>
+  <!-- Header -->
+  <div class="user-header-state-card">
+    <div class="user-info">
+      <h2>✨ {{ username || userId }}</h2>
+    </div>
+    <div class="user-totals" *ngIf="netTotal !== null" [class.updated]="totalsUpdated">
+      <div class="totals-label">💰 Current Amount</div>
+      <div class="totals-value">💰 {{ netTotal.toFixed(2) }}</div>
+    </div>
   </div>
-</div>
 
   <!-- Messages -->
   <div *ngIf="errorMessage" class="message error">{{ errorMessage }}</div>
@@ -20,28 +17,37 @@
 
   <hr />
 
-  <!-- Event Table -->
-  <h3>Events Traited :</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>Type of event</th>
-        <th>Amount</th>
-        <th>created At</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let event of events">
-        <td>{{ event.eventType }}</td>
-        <td>{{ getAmount(event) }}</td>
-        <td>{{ event.createdAt | date:'short' }}</td>
-      </tr>
-    </tbody>
-  </table>
+  <!-- Events Table -->
+  <h3>Handled Events</h3>
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>Type of Event</th>
+          <th>Amount</th>
+          <th>Created At</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let event of events" [class.recent]="isRecentEvent(event)">
+          <td>{{ event.eventType }}</td>
+          <td>{{ getAmount(event) }}</td>
+          <td>
+            <ng-container *ngIf="event.createdAt !== 'N/A'; else noDate">
+              {{ event.createdAt | date:'short' }}
+            </ng-container>
+            <ng-template #noDate>
+              <span class="badge na">N/A</span>
+            </ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
   <!-- Pagination -->
   <div class="pagination">
-    <button (click)="prevPage()" [disabled]="currentPage === 0">Précédent</button>
+    <button (click)="prevPage()" [disabled]="currentPage===0">Précédent</button>
     <span>Page {{ currentPage + 1 }}</span>
     <button (click)="nextPage()" [disabled]="events.length < pageSize">Suivant</button>
   </div>
