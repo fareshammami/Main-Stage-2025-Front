@@ -3,6 +3,15 @@ import { AdminUser } from '../../services/admin-user';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+interface AdminUserUI {
+  id: string;
+  email: string;
+  validated: boolean;
+  role: 'USER' | 'ADMIN';
+  roleUI: boolean; // true if ADMIN, false if USER
+  updatingRole?: boolean; // optional flag for optimistic update
+}
+
 @Component({
   selector: 'app-admin-user-validation',
   standalone: true,
@@ -11,7 +20,7 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./admin-user-validation.css']
 })
 export class AdminUserValidation implements OnInit {
-  users: any[] = [];
+  users: AdminUserUI[] = [];
   loading = true;
   successMessage = '';
   errorMessage = '';
@@ -28,8 +37,12 @@ export class AdminUserValidation implements OnInit {
     this.successMessage = '';
 
     this.adminUserService.getAllUsers().subscribe({
-      next: data => {
-        this.users = data;
+      next: (data) => {
+        // Map backend roles to UI roles
+        this.users = data.map(u => ({
+          ...u,
+          roleUI: u.role === 'ADMIN'
+        }));
         this.loading = false;
       },
       error: () => {
@@ -44,7 +57,7 @@ export class AdminUserValidation implements OnInit {
     this.errorMessage = '';
 
     this.adminUserService.validateUser(userId).subscribe({
-      next: res => {
+      next: (res) => {
         this.successMessage = res.message || '✅ User validated.';
         const user = this.users.find(u => u.id === userId);
         if (user) user.validated = true;
@@ -55,15 +68,29 @@ export class AdminUserValidation implements OnInit {
     });
   }
 
-  toggleRole(user: any): void {
-    const newRole = user.role === 'ADMIN' ? 'user' : 'admin';
+  toggleRole(user: AdminUserUI): void {
+    this.successMessage = '';
+    this.errorMessage = '';
+
+    // Optimistic UI: flip role immediately
+    const previousRole = user.roleUI;
+    user.roleUI = !user.roleUI;
+    user.updatingRole = true;
+
+    const newRole = user.roleUI ? 'admin' : 'user';
+
     this.adminUserService.changeRole(user.id, newRole).subscribe({
-      next: res => {
-        user.role = newRole.toUpperCase();
-        this.successMessage = res.message;
+      next: (res) => {
+        // sync backend role
+        user.role = user.roleUI ? 'ADMIN' : 'USER';
+        this.successMessage = res.message || `Role updated to ${user.role}`;
+        user.updatingRole = false;
       },
       error: () => {
+        // rollback on failure
+        user.roleUI = previousRole;
         this.errorMessage = '⚠️ Failed to change role.';
+        user.updatingRole = false;
       }
     });
   }

@@ -10,7 +10,7 @@
         <tr>
           <th>Email</th>
           <th>Validated</th>
-          <th>Role</th>
+          <!--<<th>Role (ADMIN)</th>-->
           <th>Actions</th>
         </tr>
       </thead>
@@ -18,11 +18,17 @@
         <tr *ngFor="let user of users">
           <td>{{ user.email }}</td>
           <td>{{ user.validated ? '✅' : '❌' }}</td>
-          <td>
-            <button (click)="toggleRole(user)">
-              {{ user.role === 'ADMIN' ? 'Admin' : 'User' }}
-            </button>
-          </td>
+          <!--<td>
+            <label class="switch">
+              <input
+                type="checkbox"
+                [checked]="user.roleUI"
+                [disabled]="user.updatingRole"
+                (change)="toggleRole(user)"
+              />
+              <span class="slider round"></span>
+            </label>
+          </td> -->
           <td>
             <button *ngIf="!user.validated" (click)="validate(user.id)">Validate</button>
           </td>
