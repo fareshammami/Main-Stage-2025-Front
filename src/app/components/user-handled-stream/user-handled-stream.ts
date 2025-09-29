@@ -71,7 +71,7 @@ export class UserHandledStreamComponent implements OnInit {
         this.loading = false; 
       },
       error: () => { 
-        this.errorMessage = 'Erreur lors du chargement des événements.'; 
+        this.errorMessage = 'User still need validation.'; 
         this.loading = false; 
       }
     });

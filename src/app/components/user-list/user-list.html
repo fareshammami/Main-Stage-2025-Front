@@ -9,7 +9,7 @@
       type="text"
       [(ngModel)]="searchEmail"
       (ngModelChange)="onEmailChange()"
-      placeholder="Recherche par email"
+      placeholder="Find by email"
     />
 
     <div class="amount-slider">
@@ -30,9 +30,9 @@
     <tbody>
       <tr *ngFor="let user of users">
         <td>{{ user.email }}</td>
-        <td>{{ user.lastInduAmount !== null ? user.lastInduAmount : '-' }}</td>
+        <td>{{ user.lastInduAmount !== null ? user.lastInduAmount : '-' }} €</td>
         <td>
-          <button class="view-btn" (click)="viewUser(user.id)">Voir le flux</button>
+          <button class="view-btn" (click)="viewUser(user.id)">Check the steam</button>
         </td>
       </tr>
     </tbody>

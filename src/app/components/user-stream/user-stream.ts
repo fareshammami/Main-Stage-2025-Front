@@ -82,7 +82,7 @@ export class UserStreamComponent implements OnInit {
       this.toDate ? this.toDate + "T23:59:59Z" : ''
     ).subscribe({
       next: data => { this.events = data; this.loading = false; },
-      error: () => { this.errorMessage = 'Erreur lors du chargement des événements.'; this.loading = false; }
+      error: () => { this.errorMessage = 'This user has an empty steam'; this.loading = false; }
     });
   }
 

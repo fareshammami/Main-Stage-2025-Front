@@ -58,7 +58,6 @@ export class AdminUserValidation implements OnInit {
 
     this.adminUserService.validateUser(userId).subscribe({
       next: (res) => {
-        this.successMessage = res.message || '✅ User validated.';
         const user = this.users.find(u => u.id === userId);
         if (user) user.validated = true;
       },
